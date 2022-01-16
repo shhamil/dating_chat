@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView
 from rest_framework.parsers import FormParser, MultiPartParser
 from .serializers import ClientRegistrationSerializer
+from watermark.add_watermark import add_watermark
 
 
 class UserRegistrationView(CreateAPIView):
@@ -16,6 +17,7 @@ class UserRegistrationView(CreateAPIView):
             new_user.set_password(serializer.data['password'])
             new_user.avatar = self.request.FILES['avatar']
             new_user.save()
+            add_watermark(new_user.avatar.path)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)

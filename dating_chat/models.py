@@ -11,3 +11,12 @@ class Client(AbstractUser):
     avatar = models.ImageField(null=True, upload_to=get_unical_name)
     gender = models.CharField(max_length=6, choices=GENDER_CHOICES)
     surname = models.CharField(max_length=100)
+    liking = models.ManyToManyField('self', through='Liker', related_name='likers', symmetrical=False)
+
+
+class Liker(models.Model):
+    user_from = models.ForeignKey(Client, related_name='rel_from_set', on_delete=models.CASCADE)
+    user_to = models.ForeignKey(Client, related_name="rel_to_set", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '{} likes {}'.format(self.user_from, self.user_to)

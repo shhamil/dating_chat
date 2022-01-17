@@ -3,7 +3,12 @@ from .models import Client
 
 
 class ClientRegistrationSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Client
         fields = ('username', 'first_name', 'surname', 'avatar', 'gender', 'email', 'password')
+
+
+class ClientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Client
+        fields = ('username', 'first_name', 'surname', 'gender', 'avatar')

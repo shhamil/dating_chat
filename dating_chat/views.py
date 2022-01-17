@@ -1,13 +1,16 @@
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from django.core.mail import send_mail
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.views import APIView
 
 from watermark.add_watermark import add_watermark
 from .models import Client, Liker
-from .serializers import ClientRegistrationSerializer
+from .services import ClientFilter
+from .serializers import ClientRegistrationSerializer, ClientSerializer
 
 
 class UserRegistrationView(CreateAPIView):
@@ -27,7 +30,7 @@ class UserRegistrationView(CreateAPIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserSympathyView(CreateAPIView):
+class UserSympathyView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, *args, **kwargs):
@@ -35,7 +38,7 @@ class UserSympathyView(CreateAPIView):
         if user_to == self.request.user:
             return Response({'Ошибка': 'Вы итак себе нравитесь!'})
         Liker.objects.get_or_create(user_from=self.request.user, user_to=user_to)
-        if user_to in self.request.user.liking.all():
+        if user_to in self.request.user.likers.all():
             send_mail('Взаимная симпатия',
                       'Вы понравились {}! Почта участника: {}'.format(user_to.first_name, user_to.email),
                       'shkurban0595@gmail.com',
@@ -48,3 +51,11 @@ class UserSympathyView(CreateAPIView):
             return Response({'sympathy_user_email': user_to.email}, status=status.HTTP_201_CREATED)
         else:
             return Response(status=status.HTTP_201_CREATED)
+
+
+class ClientListView(ListAPIView):
+    serializer_class = ClientSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = ClientFilter
+    queryset = Client.objects.all()

@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-(3g(weg^_g@u+gdl-qldt1mv7qk*5gax&ur#maiyu&xm$2c#96
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['sshoma.ru']
 
 # Application definition
 
@@ -116,7 +116,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
 LANGUAGE_CODE = 'ru-ru'
-
+CSRF_TRUSTED_ORIGINS = ['http://sshoma.ru']
 TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True

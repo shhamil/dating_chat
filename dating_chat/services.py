@@ -13,4 +13,6 @@ class ClientFilter(django_filters.FilterSet):
         fields = ['gender', 'first_name', 'surname', 'distance']
 
     def filter_queryset(self, queryset):
-        return Client.objects.get_nearby(self.request.user.latitude, self.request.user.longitude, self.request.GET['distance'])
+        if 'distance' in self.request.GET and self.request.GET['distance'] is not None:
+            queryset = Client.objects.get_nearby(self.request.user.latitude, self.request.user.longitude, self.request.GET['distance'], self.request.user.id)
+        return queryset.exclude(id=self.request.user.id)

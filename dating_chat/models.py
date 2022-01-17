@@ -8,14 +8,15 @@ from .utils import get_unical_name
 
 
 class LocationManager(UserManager):
-    def get_nearby(self, latitude, longitude, proximity):
+    def get_nearby(self, latitude, longitude, proximity, id):
+        self_user = Client.objects.get(id=id)
         proximity = Decimal(proximity)
-        cos_rad = Decimal(abs(math.cos(math.radians(latitude)*111.0)))
+        cos_rad = Decimal(abs(math.cos(math.radians(latitude))*111.0))
         lon1 = longitude - proximity / cos_rad
         lon2 = longitude + proximity / cos_rad
-        lat1 = latitude - (proximity / Decimal(111.0))
-        lat2 = latitude - (proximity / Decimal(111.0))
-        return Client.objects.filter(latitude__range=(lat1, lat2)).filter(longitude__range=(lon1, lon2))
+        lat1 = latitude - proximity / Decimal(111.0)
+        lat2 = latitude + proximity / Decimal(111.0)
+        return Client.objects.filter(latitude__range=(lat1, lat2)).filter(longitude__range=(lon1, lon2)).exclude(id=id)
 
 
 class Client(AbstractUser):
@@ -30,6 +31,12 @@ class Client(AbstractUser):
     liking = models.ManyToManyField('self', through='Liker', related_name='likers', symmetrical=False)
     latitude = models.DecimalField(max_digits=10, decimal_places=6, null=True)
     longitude = models.DecimalField(max_digits=10, decimal_places=6, null=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['latitude']),
+            models.Index(fields=['longitude']),
+        ]
 
 
 class Liker(models.Model):
